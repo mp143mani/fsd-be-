@@ -1,11 +1,11 @@
 import express from "express";
 import { MongoClient } from "mongodb";
 import * as dotenv from "dotenv";
-import cors from "cors"
+import cors from "cors";
 dotenv.config();
 
 const app = express();
-app.use(cors())
+app.use(cors());
 const PORT = 5000;
 // console.log(process.env.MONGO_URL);
 //MongoDb connection
@@ -49,58 +49,84 @@ app.get("/", (req, res) => {
   `);
 });
 
-
+// Get all products
 app.get("/products", async (req, res) => {
-  const product = await client
-    .db("B46-product-ap")
-    .collection("products")
-    .find()
-    .toArray();
-  res.send(product);
+  try {
+    const product = await client
+      .db("fsd-demo")
+      .collection("products")
+      .find()
+      .toArray();
+    res.send(product);
+  } catch (error) {
+    res.status(500).send({ error: "Failed to retrieve products" });
+  }
 });
 
-//get product by ID
+// Get product by ID
 app.get("/products/:id", async (req, res) => {
-  const { id } = req.params;
-  const product = await client
-    .db("fsd-demo")
-    .collection("products")
-    .findOne({ id: id });
-  res.send(product);
+  try {
+    const { id } = req.params;
+    const product = await client
+      .db("fsd-demo")
+      .collection("products")
+      .findOne({ id: id });
+    if (!product) {
+      return res.status(404).send({ error: "Product not found" });
+    }
+    res.send(product);
+  } catch (error) {
+    res.status(500).send({ error: "Failed to retrieve product" });
+  }
 });
 
-//delete product by ID
+// Delete product by ID
 app.delete("/products/:id", async (req, res) => {
-  const { id } = req.params;
-  const product = await client
-    .db("B46-product-app")
-    .collection("products")
-    .deleteOne({ id: id });
-  res.send(product);
+  try {
+    const { id } = req.params;
+    const result = await client
+      .db("fsd-demo")
+      .collection("products")
+      .deleteOne({ id: id });
+    if (result.deletedCount === 0) {
+      return res.status(404).send({ error: "Product not found" });
+    }
+    res.send({ message: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).send({ error: "Failed to delete product" });
+  }
 });
 
-//add product
+// Add product
 app.post("/products", async (req, res) => {
-  //where we will pass data - body
-  const newProduct = req.body;
-  const result = await client
-    .db("B46-product-app")
-    .collection("products")
-    .insertMany(newProduct);
-  res.send(result);
+  try {
+    const newProduct = req.body;
+    const result = await client
+      .db("fsd-demo")
+      .collection("products")
+      .insertMany(newProduct);
+    res.send(result);
+  } catch (error) {
+    res.status(500).send({ error: "Failed to add product" });
+  }
 });
 
-//update products
-
+// Update product by ID
 app.put("/products/:id", async (req, res) => {
-  const { id } = req.params;
-  //where we will pass data - body
-  const updatedProduct = req.body;
-  const result = await client
-    .db("B46-product-app")
-    .collection("products")
-    .updateOne({ id: id }, { $set: updatedProduct });
-  res.send(result);
+  try {
+    const { id } = req.params;
+    const updatedProduct = req.body;
+    const result = await client
+      .db("fsd-demo")
+      .collection("products")
+      .updateOne({ id: id }, { $set: updatedProduct });
+    if (result.matchedCount === 0) {
+      return res.status(404).send({ error: "Product not found" });
+    }
+    res.send({ message: "Product updated successfully" });
+  } catch (error) {
+    res.status(500).send({ error: "Failed to update product" });
+  }
 });
 
 app.listen(PORT, () => console.log("Server started on the port", PORT));
