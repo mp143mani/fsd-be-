@@ -20,10 +20,35 @@ async function createConnection() {
 const client = await createConnection();
 
 app.use(express.json());
-
 app.get("/", (req, res) => {
-  res.send("Hello Everyone🥳🥳🥳");
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Welcome</title>
+      <style>
+        body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+        }
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+      </style>
+    </head>
+    <body>
+      <img src="https://t4.ftcdn.net/jpg/08/36/42/81/360_F_836428157_5dm5SdeL8Q12z6VjIz3Y054CCP05LGW2.jpg" alt="Welcome Greeting" />
+    </body>
+    </html>
+  `);
 });
+
 
 app.get("/products", async (req, res) => {
   const product = await client
