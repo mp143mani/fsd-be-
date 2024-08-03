@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 
 app.get("/products", async (req, res) => {
   const product = await client
-    .db("B46-product-app")
+    .db("B46-product-ap")
     .collection("products")
     .find()
     .toArray();
@@ -38,7 +38,7 @@ app.get("/products", async (req, res) => {
 app.get("/products/:id", async (req, res) => {
   const { id } = req.params;
   const product = await client
-    .db("B46-product-app")
+    .db("fsd-demo")
     .collection("products")
     .findOne({ id: id });
   res.send(product);
